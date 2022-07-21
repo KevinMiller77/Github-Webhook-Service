@@ -8,7 +8,7 @@ Description: >
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
-    Timeout: 3
+    Timeout: 20
     Tracing: Active
   Api:
     TracingEnabled: True
@@ -17,9 +17,9 @@ Resources:
   GithubWebhookServiceLambdaFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      CodeUri: source/
-      Handler: lambda_main.handler
-      Runtime: python3.9
+      CodeUri: app/
+      Handler: com.github.webhook.LamdaHandler::handleRequest
+      Runtime: java8.al2
       Architectures:
         - x86_64
       Events:
@@ -28,6 +28,14 @@ Resources:
           Properties:
             Path: /test
             Method: get
+  GithubWebhookServiceTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PrimaryKey: 
+        Name: pk
+        Type: String
+      TableName: GithubWebhookServiceTable
+
 
 
 Outputs:
@@ -45,3 +53,4 @@ Outputs:
     Value: !GetAtt GithubWebhookServiceLambdaFunctionRole.Arn
   GithubWebhookServiceTable:
     Description: "Dynamo DB Table for storing things that need to be saved"
+    Value: !GetAtt GithubWebhookServiceTable.Arn

@@ -242,3 +242,9 @@ $RECYCLE.BIN/
 */build/*
 
 .aws-sam/
+# Ignore Gradle project-specific cache directory
+.gradle
+
+# Ignore Gradle build output directory
+app/build
+app/bin
