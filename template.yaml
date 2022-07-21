@@ -1,0 +1,47 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Github Webhook Service
+
+  Recieve github webhook data and dispatch to various places
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 3
+    Tracing: Active
+  Api:
+    TracingEnabled: True
+
+Resources:
+  GithubWebhookServiceLambdaFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: source/
+      Handler: lambda_main.handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Events:
+        GithubWebhookService:
+          Type: Api 
+          Properties:
+            Path: /test
+            Method: get
+
+
+Outputs:
+  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
+  # Find out more about other implicit resources you can reference within SAM
+  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+  GithubWebhookServiceApi:
+    Description: "API Gateway endpoint URL for Prod stage for Github Webhook Lambda Function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hook/"
+  GithubWebhookServiceLambdaFunction:
+    Description: "Github Webhook Lambda Function ARN"
+    Value: !GetAtt GithubWebhookServiceLambdaFunction.Arn
+  GithubWebhookServiceLambdaFunctionRole:
+    Description: "Implicit IAM Role created for lambda function"
+    Value: !GetAtt GithubWebhookServiceLambdaFunctionRole.Arn
+  GithubWebhookServiceTable:
+    Description: "Dynamo DB Table for storing things that need to be saved"
